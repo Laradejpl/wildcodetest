@@ -1,10 +1,40 @@
 const express = require("express");
 const app = express();
+const http = require("http").createServer(app);
 const mysql = require("promise-mysql");
 const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//pour SOCKETIO
+
+const chat = (io) => {
+  io.on("connection", (socket) => {
+    console.log("a user connected!");
+    console.log("Socket ID: ", socket.id);
+    socket.on("message", (message) => {
+      console.log(message);
+      let messageAnId = {
+        message: message,
+        idsocket: socket.id,
+      };
+      io.emit("ecoutemessage", messageAnId);
+      //io.emit("envoiId", socket.id);
+    });
+  });
+};
+
+const io = require("socket.io")(http, {
+  path: "/socket.io",
+  cors: {
+    origin: ["http://projetdigital.alwaysdata.net/"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true,
+    optionsSuccessStatus: 204,
+  },
+});
 //let config;
 console.log(process.env.HOST_DB);
 if (!process.env.HOST_DB) {
@@ -48,8 +78,8 @@ mysql
     argonautesRoutes(app, db);
   })
   .catch((err) => console.log(err));
-
+chat(io);
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
+http.listen(PORT, () => {
   console.log("listening port " + PORT + " all is ok");
 });
