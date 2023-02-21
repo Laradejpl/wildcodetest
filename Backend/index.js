@@ -3,6 +3,7 @@ const app = express();
 const http = require("http").createServer(app);
 const mysql = require("promise-mysql");
 const cors = require("cors");
+require("dotenv").config();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -10,25 +11,13 @@ app.use(express.urlencoded({ extended: true }));
 //pour SOCKETIO
 
 const chat = (io) => {
-  io.on("connection", (socket) => {
-    console.log("a user connected!");
-    console.log("Socket ID: ", socket.id);
-    socket.on("message", (message) => {
-      console.log(message);
-      let messageAnId = {
-        message: message,
-        idsocket: socket.id,
-      };
-      io.emit("ecoutemessage", messageAnId);
-      //io.emit("envoiId", socket.id);
-    });
-  });
+  console.log("yoooooooooooooooo");
 };
 
 const io = require("socket.io")(http, {
   path: "/socket.io",
   cors: {
-    origin: ["http://projetdigital.alwaysdata.net/"],
+    origin: ["https://iodotio.alwaysdata.net"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
     credentials: true,

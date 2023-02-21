@@ -8,17 +8,23 @@ import "./argo.css";
 function App() {
   const [personnes, setPersonnes] = useState([]);
   const [argonaute, setArgonaute] = useState("");
+  const socket = io("https://iodotio.alwaysdata.net");
   useEffect(() => {
     getAllArgo()
       .then((res) => {
         //console.log(res);
         setPersonnes(res.argonautes);
-        console.log("LES ARGOMACHIN", personnes);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [personnes]);
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connecter au serveur");
+    });
+  }, [socket]);
 
   const onSubmitForm = () => {
     let datas = {
@@ -36,6 +42,8 @@ function App() {
       .catch((err) => {
         console.log(err);
       });
+
+    socket.emit("message", argonaute);
   };
 
   return (
